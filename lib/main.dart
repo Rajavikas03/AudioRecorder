@@ -1,28 +1,10 @@
-/*
- * Copyright 2018, 2019, 2020, 2021 Dooboolab.
- *
- * This file is part of Flutter-Sound.
- *
- * Flutter-Sound is free software: you can redistribute it and/or modify
- * it under the terms of the Mozilla Public License version 2 (MPL2.0),
- * as published by the Mozilla organization.
- *
- * Flutter-Sound is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * MPL General Public License for more details.
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-
 import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+import 'package:gap/gap.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -54,36 +36,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/*
- * This is an example showing how to record to a Dart Stream.
- * It writes all the recorded data from a Stream to a File, which is completely stupid:
- * if an App wants to record something to a File, it must not use Streams.
- *
- * The real interest of recording to a Stream is for example to feed a
- * Speech-to-Text engine, or for processing the Live data in Dart in real time.
- *
- */
-
-///
 typedef _Fn = void Function();
-
-/* This does not work. on Android we must have the Manifest.permission.CAPTURE_AUDIO_OUTPUT permission.
- * But this permission is _is reserved for use by system components and is not available to third-party applications._
- * Pleaser look to [this](https://developer.android.com/reference/android/media/MediaRecorder.AudioSource#VOICE_UPLINK)
- *
- * I think that the problem is because it is illegal to record a communication in many countries.
- * Probably this stands also on iOS.
- * Actually I am unable to record DOWNLINK on my Xiaomi Chinese phone.
- *
- */
-//const theSource = AudioSource.voiceUpLink;
-//const theSource = AudioSource.voiceDownlink;
 
 const theSource = AudioSource.microphone;
 
-/// Example app.
 class SimpleRecorder extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _SimpleRecorderState createState() => _SimpleRecorderState();
 }
 
@@ -161,7 +120,7 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
     _mRecorderIsInited = true;
   }
 
-  // ----------------------  Here is the code for recording and playback -------
+  // <----------------------  Here is the code for recording and playback ------------------->
 
   void record() {
     _mRecorder!
@@ -208,7 +167,7 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
     });
   }
 
-// ----------------------------- UI --------------------------------------------
+// <----------------------------- UI -------------------------------------------->
 
   _Fn? getRecorderFn() {
     if (!_mRecorderIsInited || !_mPlayer!.isStopped) {
@@ -236,7 +195,7 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
             width: double.infinity,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Color(0xFFFAF0E6),
+              color: const Color(0xFFFAF0E6),
               border: Border.all(
                 color: Colors.indigo,
                 width: 3,
@@ -249,7 +208,7 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
                 //disabledColor: Colors.grey,
                 child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               Text(_mRecorder!.isRecording
@@ -264,7 +223,7 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
             width: double.infinity,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Color(0xFFFAF0E6),
+              color: const Color(0xFFFAF0E6),
               border: Border.all(
                 color: Colors.indigo,
                 width: 3,
@@ -277,7 +236,7 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
                 //disabledColor: Colors.grey,
                 child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               Text(_mPlayer!.isPlaying
@@ -301,82 +260,85 @@ class _SimpleRecorderState extends State<SimpleRecorder> {
 
   Widget scaffold() {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Audio recorder',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          centerTitle: true,
+      appBar: AppBar(
+        title: Text(
+          'Audio recorder',
+          style: Theme.of(context).textTheme.titleLarge,
         ),
-        // backgroundColor: Colors.teal.shade700,
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
+      ),
+      // backgroundColor: Colors.teal.shade700,
 
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              StreamBuilder<RecordingDisposition>(
-                builder: (context, snapshot) {
-                  final duration = snapshot.hasData
-                      ? snapshot.data!.duration
-                      : Duration.zero;
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            StreamBuilder<RecordingDisposition>(
+              builder: (context, snapshot) {
+                final duration =
+                    snapshot.hasData ? snapshot.data!.duration : Duration.zero;
 
-                  String twoDigits(int n) => n.toString().padLeft(2, '0');
+                String twoDigits(int n) => n.toString().padLeft(2, '0');
 
-                  twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-                  twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+                twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+                twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
 
-                  return Text(
-                    '$twoDigitMinutes:$twoDigitSeconds',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  );
-                },
-                stream: _mRecorder!.onProgress,
+                return Text(
+                  '$twoDigitMinutes:$twoDigitSeconds',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold,
+                  ),
+                );
+              },
+              stream: _mRecorder!.onProgress,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed:
+                  //       if (_mRecorder!.isRecording) {
+                  //         await stopRecorder();
+                  //         setState(() {
+                  //           // recorder.isRecording = !recorder.isRecording;
+                  //           // twoDigitMinutes = " ";
+                  //           // twoDigitSeconds = " ";
+                  //         });
+                  //       }
+                  // else {
+                  //   await startRecord();
+                  //   setState(() {
+                  //     // twoDigitMinutes = " ";
+                  //     // twoDigitSeconds = " ";
+                  //   });
+                  // }
+                  getRecorderFn(),
+              child: Icon(
+                _mRecorder!.isRecording ? Icons.stop : Icons.mic,
+                size: 100,
+                color: _mRecorder!.isRecording
+                    ? Colors.red
+                    : Colors.lightBlueAccent,
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed:
-                    // if (_mRecorder!.isRecording) {
-                    //   await stopRecorder();
-                    //   setState(() {
-                    //     // recorder.isRecording = !recorder.isRecording;
-                    //     // twoDigitMinutes = " ";
-                    //     // twoDigitSeconds = " ";
-                    //   });
-                    // } else {
-                    //   await startRecord();
-                    //   setState(() {
-                    //     // twoDigitMinutes = " ";
-                    //     // twoDigitSeconds = " ";
-                    //   });
-                    // }
-                    getRecorderFn(),
-                child: Icon(
-                  _mRecorder!.isRecording ? Icons.stop : Icons.mic,
-                  size: 100,
-                  color: _mRecorder!.isRecording
-                      ? Colors.red
-                      : Colors.lightBlueAccent,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: getRecorderFn(),
-                //color: Colors.white,
-                //disabledColor: Colors.grey,
-                child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
-              ),
-              ElevatedButton(
-                onPressed: getPlaybackFn(),
-                //color: Colors.white,
-                //disabledColor: Colors.grey,
-                child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
-              ),
-            ],
-          ),
-        ));
+            ),
+            Gap(20),
+            ElevatedButton(
+              onPressed: getRecorderFn(),
+              //color: Colors.white,
+              //disabledColor: Colors.grey,
+              child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
+            ),
+            Gap(20),
+            ElevatedButton(
+              onPressed: getPlaybackFn(),
+              //color: Colors.white,
+              //disabledColor: Colors.grey,
+              child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
