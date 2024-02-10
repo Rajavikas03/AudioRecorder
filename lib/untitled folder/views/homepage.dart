@@ -31,6 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future initRecorder() async {
     final status = await Permission.microphone.request();
+    final staus = await Permission.storage.request();
+    print(staus.isGranted);
     if (status != PermissionStatus.granted) {
       throw 'Permission not granted';
     }
@@ -118,6 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Assume you have the file path stored in the 'filePath' variable
     final filePath = await recorder.stopRecorder();
     final file = File(filePath!);
+  
 
     // Get the directory for storing app documents
     Directory appDocDir = await getTemporaryDirectory();

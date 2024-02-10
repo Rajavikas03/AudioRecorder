@@ -42,6 +42,8 @@ dependencies:
   # Permission Handler 
   permission_handler: ^11.2.0
   path_provider: ^2.1.2
+  audio_session: ^0.1.18
+  flutter_sound_platform_interface: ^9.2.13
 
   # flutter_sound_lite: ^8.5.0
 
