@@ -41,8 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future startRecord() async {
+    // Get the directory for storing app documents
+    Directory appDocDir = await getTemporaryDirectory();
+
+    // Specify the destination file path in the app's document directory
+    String destFilePath = '${appDocDir.path}/.wav';
     final fill = await recorder.startRecorder(
-      toFile: "audio.wav",
+      toFile: destFilePath,
       // audioSource:
     );
     setState(() {
@@ -120,7 +125,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // Assume you have the file path stored in the 'filePath' variable
     final filePath = await recorder.stopRecorder();
     final file = File(filePath!);
-  
 
     // Get the directory for storing app documents
     Directory appDocDir = await getTemporaryDirectory();
@@ -134,9 +138,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // File saved successfully
       print('File saved to: $destFilePath');
-      print(appDocDir);
-      print(file);
-      print(filePath);
+      // print(appDocDir);
+      // print(file);
+      // print(filePath);
     } catch (e) {
       // Handle errors, such as permission issues or file not found
       print('Error saving file: $e');
@@ -158,8 +162,6 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           centerTitle: true,
         ),
-        // backgroundColor: Colors.teal.shade700,
-
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
